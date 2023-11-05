@@ -14,6 +14,7 @@ fn main() -> ExitCode {
 
     let git_wrapper = GitWrapper {};
 
+    // Make sure the initial path is valid and that it's inside a git work tree
     match git_wrapper.is_inside_work_tree(run_options.initial_path()) {
         Ok(is_inside_work_tree) => {
             if !is_inside_work_tree {
@@ -34,6 +35,7 @@ fn main() -> ExitCode {
         }
     };
 
+    // Determine the top level git directory for the initial path
     let top_level = match git_wrapper.top_level(run_options.initial_path()) {
         Ok(top_level) => {
             if PathBuf::from(&top_level).exists() {
@@ -46,6 +48,7 @@ fn main() -> ExitCode {
                 return ExitCode::from(3);
             }
         }
+        // It's a git work tree with no top level directory? Only theoretically possible, I think!
         Err(error) => {
             eprint!(
                 "Error: couldn't get git top level path for {:?}: {}",

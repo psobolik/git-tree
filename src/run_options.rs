@@ -20,8 +20,8 @@ impl RunOptions {
             PrefixSet {
                 parent_prefix: r"|   ".to_string(),
                 no_parent_prefix: r"    ".to_string(),
-                entry_prefix: r"+-- ".to_string(),
-                last_entry_prefix: r"\-- ".to_string(),                
+                entry_prefix: r"|-- ".to_string(),
+                last_entry_prefix: r"`-- ".to_string(),                
             }
         } else {
             PrefixSet {
