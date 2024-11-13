@@ -36,25 +36,27 @@ impl GitWrapper {
 }
 
 fn parse_tree(tree_string: String) -> Vec<GitObject> {
-    let lines = tree_string.lines();
+    let regex = regex::Regex::new(r"^(?<mode>\d+)\s+(?<type>\S+)\s+(?<name>\S+)\s+(?<size>\S+)\s+(?<path>\S+)$").unwrap();
     let mut result = vec![];
+    let lines = tree_string.lines();
     for line in lines {
-        let fields: Vec<&str> = line.split('\t').collect();
-        result.push(GitObject::new(
-            u32::from_str_radix(fields[0], 8).unwrap_or_default(),
-            match fields[1] {
-                "commit" => Some(GitObjectType::Commit),
-                "blob" => Some(GitObjectType::Blob),
-                "tree" => Some(GitObjectType::Tree),
-                &_ => None, // This should never happen
-            },
-            String::from(fields[2]),
-            match fields[3].parse::<usize>() {
-                Ok(size) => Some(size),
-                _ => None,
-            },
-            String::from(fields[4]),
-        ));
+        if let Some(fields) = regex.captures(&line) {
+            result.push(GitObject::new(
+                u32::from_str_radix(&fields["mode"], 8).unwrap_or_default(),
+                match &fields["type"] {
+                    "commit" => Some(GitObjectType::Commit),
+                    "blob" => Some(GitObjectType::Blob),
+                    "tree" => Some(GitObjectType::Tree),
+                    &_ => None, // This should never happen
+                },
+                String::from(&fields["name"]),
+                match fields["size"].parse::<usize>() {
+                    Ok(size) => Some(size),
+                    _ => None, // "tree" objects have no size
+                },
+                String::from(&fields["path"]),
+            ));
+        }
     }
     result
 }

@@ -12,7 +12,7 @@ pub fn ls_tree(path: &PathBuf) -> Result<String, GitWrapperError> {
         path,
         "ls-tree",
         Vec::from([
-            "--format=%(objectmode)%x09%(objecttype)%x09%(objectname)%x09%(objectsize)%x09%(path)",
+            "--long",
             "HEAD",
         ]),
     )
